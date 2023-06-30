@@ -104,7 +104,7 @@ namespace Business.Concrete
 
         public IDataResult<List<CarDetailDto>> GetCarsBrandId(int BrandId)
         {
-            return new SuccessDataResult<List<CarDetailDto>>(_carDal.get);
+            return new SuccessDataResult<List<CarDetailDto>>(_carDal.GetCarsBrandId(2));
         }
     }
 }
