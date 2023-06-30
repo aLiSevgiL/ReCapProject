@@ -1,0 +1,315 @@
+create or alter procedure KALITEKONTROLRAPORU_1 (
+    ABASLANGICTARIHI timestamp,
+    ABITISTARIHI timestamp,
+    APARTIYIL integer,
+    APARTIID integer,
+    ARECETEID varchar(20),
+    AFIRMAID varchar(20),
+    ABOYASIPARISYIL integer,
+    ABOYASIPARISID integer,
+    AIMALATTIPIID integer,
+    AHAMID integer,
+    ABOYASIPSIRANO integer,
+    AONAYDURUMU integer,
+    AHAMTIPIID integer)
+returns (
+    PARTIKAYITID integer,
+    PARTISIRANO integer,
+    PARTIYIL integer,
+    PARTIID integer,
+    PARTIIDSTR varchar(30),
+    BOYASIPARISYIL integer,
+    BOYASIPARISID integer,
+    BOYASIPARISIDSTR varchar(30),
+    BOYASIPSIRANO integer,
+    PARTIGRUPID varchar(4),
+    PARTIGRUPADI varchar(30),
+    FIRMAID varchar(20),
+    FIRMAADI varchar(100),
+    ACILISTARIHI timestamp,
+    PARTITERMINTARIHI timestamp,
+    PARTISINIFID integer,
+    BOYASIPARISDETAYID integer,
+    HAMADITOPLAMI varchar(255),
+    HAMADI2 varchar(255),
+    HAMADI3 varchar(255),
+    HAMADI4 varchar(255),
+    KALITEKONTROLTARIHI timestamp,
+    BRUTKILO numeric(12,3),
+    BRUTMETRE numeric(12,3),
+    MUSTERIRENKKODUVEADI varchar(30),
+    MUSTERISIPARISNO varchar(50),
+    RECETEID varchar(20),
+    RECETEADI varchar(40),
+    ISLEMGRUBUADI varchar(20),
+    ISLEMTIPIADI varchar(20),
+    FASON integer,
+    FASONSTR varchar(5),
+    K1KILOTOPLAMI numeric(12,3),
+    K1METRETOPLAMI numeric(12,3),
+    K1TOPADEDI integer,
+    K2KILOTOPLAMI numeric(12,3),
+    K2METRETOPLAMI numeric(12,3),
+    K2TOPADEDI integer,
+    K3KILOTOPLAMI numeric(12,3),
+    K3METRETOPLAMI numeric(12,3),
+    K3TOPADEDI integer,
+    K4KILOTOPLAMI numeric(12,3),
+    K4METRETOPLAMI numeric(12,3),
+    K4TOPADEDI integer,
+    K5KILOTOPLAMI numeric(12,3),
+    K5METRETOPLAMI numeric(12,3),
+    K5TOPADEDI integer,
+    KILOTOPLAMI numeric(12,3),
+    METRETOPLAMI numeric(12,3),
+    KILOFIREORANI double precision,
+    METREFIREORANI double precision,
+    GIRISPERSONELADI varchar(40),
+    GIRISTARIHI timestamp,
+    CIKISPERSONELADI varchar(40),
+    CIKISTARIHI timestamp,
+    DESENID varchar(20),
+    DESENADI varchar(50),
+    DESENVARYANTID integer,
+    VARYANTADI varchar(30),
+    IMALATTIPIID integer,
+    IMALATTIPISTR varchar(5),
+    REFERANSSIPARISNO varchar(30),
+    K5REDMETRE BOYAMIKTARSIZE,
+    K4REDMETRE BOYAMIKTARSIZE,
+    K3REDMETRE BOYAMIKTARSIZE,
+    K2REDMETRE BOYAMIKTARSIZE,
+    K1REDMETRE BOYAMIKTARSIZE,
+    ENVERILEN varchar(10),
+    GRAMAJVERILEN varchar(10),
+    CEKMEZLIKENVERILEN double precision,
+    CEKMEZLIKBOYVERILEN double precision,
+    CEKMEZLIKENVERILENSTR varchar(30),
+    CEKMEZLIKBOYVERILENSTR varchar(30),
+    REFERANSKODU HAMKODUSIZE,
+    DESENTASARIMNO type of column DESEN.TASARIMNO,
+    NETKILOTOPLAMI numeric(12,3),
+    FIREKG numeric(12,3),
+    PONO varchar(30),
+    SASNO varchar(30),
+    SIPARISKALITEADI varchar(255),
+    KALITEID KALITEKODUSIZE,
+    PANTONEKODU varchar(20),
+    LabReceteAciklama VarChar(20) )
+as
+declare variable APARTIKAYITID integer;
+declare variable ABOYASIPARISKAYITID integer;
+declare variable KALITENO integer;
+declare variable KILO numeric(12,3);
+declare variable DARA numeric(12,3);
+declare variable METRE numeric(12,3);
+declare variable FH1 varchar(3000);
+declare variable FH2 varchar(3000);
+declare variable FH3 varchar(3000);
+declare variable FH4 varchar(3000);
+declare variable FH5 varchar(3000);
+declare variable KALITEKONTROLASAMAID integer;
+declare variable PARTIASAMALARIID integer;
+declare variable ONAYDURUMU integer;
+declare variable DARATOPLAMI numeric(12,3);
+declare variable HSTIPLIK integer;
+declare variable HSTELYAF integer;
+declare variable HSTTELEF integer;
+declare variable HSTORMEKUMAS integer;
+declare variable HSTRIBANA integer;
+declare variable HSTAKSESUAR integer;
+declare variable HSTDOKUMAKUMAS integer;
+begin
+  ABoyaSiparisKayitId = NUll;
+  APartiKayitId = null;
+
+  Select hstIplik, hstElyaf, hstTelef, hstOrmeKumas, hstDokumaKumas, hstRibana, hstAksesuar from HamTipiGetir into :hstIplik, :hstElyaf, :hstTelef, :hstOrmeKumas, :hstDokumaKumas, :hstRibana, :hstAksesuar;
+
+  if (ABoyaSiparisId is not null) then
+    Select BoyaSiparisKayitId from BoyaSiparis where BoyaSiparis.BoyaSiparisYil = :ABoyaSiparisYil and BoyaSiparis.BoyaSiparisId = :ABoyaSiparisId into :ABoyaSiparisKayitId;
+
+  if (APartiId is not null) then
+    Select PartiKayitId from Parti where Parti.PartiYil = :APartiYil and Parti.PartiId = :APartiId into :APartiKayitId;
+
+  Select Max(AsamaID) from Asama where Asama.KaliteKontrolAsamasimi = 1 into :KaliteKontrolAsamaID;
+
+  for select Distinct Parti.PartiKayitId, Parti.PartiYil, Parti.PartiId, BoyaSiparis.BoyaSiparisYil, BoyaSiparis.BoyaSiparisId,
+             Parti.PartigrupId, PartiGrup.Adi, Parti.FirmaId, Firma.Adi, Parti.AcilisTarihi, PartiStok.PartiSinifId, PartiStok.BoyaSiparisDetayId,
+             PartiStok.HamAdiToplami, PSKaliteKontrolAsama.KKBitisTarihi, PartiStok.Kilo, PartiStok.Metre, Parti.receteId, Recete.Adi,
+             IslemGrubu.Adi, IslemTipi.Adi, Parti.Fason, BoyaSiparisdetay.MusteriRenkKoduveAdi, BoyaSiparisdetay.MusteriSiparisNo,
+             Ham.Adi2, Ham.Adi3, Ham.Adi4, PartiStok.PartiSiraNo, DesenVaryant.DesenId, Desen.Adi, DesenVaryant.DesenVaryantId, DesenVaryant.VaryantAdi, Parti.ImalatTipiId,
+             BoyaSiparisDetay.ReferansSiparisNo, BoyaSiparisDetay.SiraNo, Parti.TerminTarihi,
+             PartiStokFizikKontrol.EnVerilen, PartiStokFizikKontrol.GramajVerilen, PartiStokFizikKontrol.CekmezlikEnVerilen, PartiStokFizikKontrol.CekmezlikBoyVerilen,
+             cast (case when (PartiStokFizikKontrol.CekmezlikEnVerilen is null) then ''''
+                         else format_float('0.##', PartiStokFizikKontrol.CekmezlikEnVerilen )
+                         end as varchar (30)) CekmezlikEnVerilenStr,
+             cast (case when (PartiStokFizikKontrol.CekmezlikBoyVerilen is null) then ''''
+                        else format_float('0.##', PartiStokFizikKontrol.CekmezlikBoyVerilen)
+                        end as varchar (30)) CekmezlikBoyVerilenStr, Ham.ReferansKodu, Desen.TasarimNo, BoyaSiparisDetay.PoNo, BoyaSiparisDetay.SasNo, Kalite.KaliteAdi,
+             BoyaSiparisDetay.KaliteId, LabRecete.PantoneKodu,LabRecete.Aciklama from PSKaliteKontrolAsama
+    left join PSKaliteKontrol on PSKaliteKontrol.pskalitekontrolasamaid = PSKaliteKontrolAsama.PSKaliteKontrolAsamaId
+    left join PartiStok on PartiStok.PartiSinifID = PSKaliteKontrol.PartiSinifID
+    left join Parti on Parti.PartiKayitId = PartiStok.PartiKayitId
+    left join Firma on Firma.FirmaId = Parti.FirmaId
+    left join PartiGrup on PartiGrup.PartiGrupId = Parti.PartiGrupId
+    left join Recete on Recete.ReceteId = Parti.ReceteId
+    left join BoyaSiparisDetay on BoyaSiparisDetay.BoyaSiparisDetayId = PartiStok.BoyaSiparisDetayId
+    left join IslemTipi on IslemTipi.IslemTipiId = Parti.IslemTipiId
+    left join IslemGrubu on IslemGrubu.IslemGrubuId = Parti.IslemGrubuId
+    left join BoyaSiparis on BoyaSiparis.BoyaSiparisKayitId = Parti.BoyaSiparisKayitId
+    left join Ham on Ham.HamId = BoyaSiparisDetay.HamId
+    left join DesenVaryant on DesenVaryant.DesenVaryantId = Parti.DesenVaryantId
+    left join Desen on Desen.DesenId = DesenVaryant.DesenId
+    left join Kalite on Kalite.Kaliteid = BoyaSiparisDetay.Kaliteid
+    left join PartiStokFizikKontrol on PartiStokFizikKontrol.PartiSinifId = PsKaliteKontrol.PartiSinifId and PartiStokFizikKontrol.SonKayit = 1
+    Left Join LabRecete on LabRecete.LabReceteId = BoyaSiparisDetay.LabReceteId
+    where PSKaliteKontrolAsama.KKBitisTarihi >= :ABaslangicTarihi and PSKaliteKontrolAsama.KKBitisTarihi <= :ABitisTarihi and
+          (PartiStok.PartiKayitID = :APartiKayitID or :APartiKayitID is null) and
+          (Parti.BoyaSiparisKayitId = :ABoyaSiparisKayitId or :ABoyaSiparisKayitId is null) and
+          (Parti.ReceteId = :AReceteId or :AReceteId is null) and
+          (Firma.AnaHesapFirmaId = :AFirmaId or :AFirmaId is null) and
+          (Parti.ImalatTipiId = :AImalatTipiId or :AImalatTipiId is null) and
+          (PartiStok.HamId = :AHamId or :AHamId is null) and
+          (BoyaSiparisDetay.SiraNo = :ABoyaSipSiraNo or :ABoyaSipSiraNo is null) and
+          (PSKaliteKontrol.OnayDurumu = :AOnayDurumu or :AOnayDurumu is Null) and
+          ( ( (Ham.HamTipiId = :hstOrmeKumas or Ham.HamTipiId = :hstRibana or Ham.HamTipiId = :hstAksesuar) and :AHamTipiId = 0) or
+            (Ham.HamTipiId = :hstDokumaKumas and :AHamTipiId = 1) or :AHamTipiId is null)
+    into :PartiKayitId, :PartiYil, :PartiId, :BoyaSiparisYil, :BoyaSiparisId, :PartigrupId, :PartiGrupAdi, :FirmaId, :FirmaAdi, :AcilisTarihi, :PartiSinifId, :BoyaSiparisDetayId,
+         :HamAdiToplami, :KaliteKontrolTarihi, :BrutKilo, :BrutMetre, :ReceteId, :ReceteAdi, :IslemGrubuAdi, :IslemTipiAdi, :Fason,
+         :MusteriRenkKoduveAdi, :MusteriSiparisNo, :HamAdi2, :HamAdi3, :HamAdi4, :PartiSiraNo, :DesenId, :DesenAdi, :DesenVaryantId, :VaryantAdi, :ImalatTipiId,
+         :ReferansSiparisNo, :BoyaSipSiraNo, :PartiTerminTarihi, :EnVerilen, :GramajVerilen, :CekmezlikEnVerilen , :CekmezlikBoyVerilen, :CekmezlikEnVerilenStr,
+         :CekmezlikBoyVerilenStr, :ReferansKodu, :DesenTasarimNo, :PoNo, :SasNo, :SiparisKaliteAdi, :KaliteId, :PantoneKodu , :LabReceteAciklama do
+  begin
+    if (ImalatTipiId = 0) then ImalatTipiStr = 'Boya';
+    if (ImalatTipiId = 1) then ImalatTipiStr = 'Baskı';
+
+    if (Fason = 1) then FasonStr = 'Fason';
+    else FasonStr = '';
+
+    if (BoyaSiparisId is not null) then BoyaSiparisIdStr = '(' || EgemenIntegerToStr(BoyaSiparisYil)  || ') ' || EgemenIntegerToStr(BoyaSiparisId) || ' ';
+    else BoyaSiparisIdStr = '';
+
+    PartiIdStr = '(' || EgemenIntegerToStr(PartiYil)  || ') ' || EgemenIntegerToStr(PartiId) || ' ';
+
+
+    K1KiloToplami           = 0;
+    K1MetreToplami          = 0;
+    K1TopAdedi              = 0;
+
+    K2KiloToplami           = 0;
+    K2MetreToplami          = 0;
+    K2TopAdedi              = 0;
+
+    K3KiloToplami           = 0;
+    K3MetreToplami          = 0;
+    K3TopAdedi              = 0;
+
+    K4KiloToplami           = 0;
+    K4MetreToplami          = 0;
+    K4TopAdedi              = 0;
+
+    K5KiloToplami           = 0;
+    K5MetreToplami          = 0;
+    K5TopAdedi              = 0;
+
+    KiloFireOrani         = 0;
+    MetreFireOrani        = 0;
+
+    K1REDMETRE           =0;
+    K2REDMETRE           =0;
+    K3REDMETRE           =0;
+    K4REDMETRE           =0;
+    K5REDMETRE           =0;
+    DaraToplami          =0;
+    For Select PSKaliteKontrol.KaliteNo, PSKaliteKontrol.Kilo, PSKaliteKontrol.Metre, PSKaliteKontrol.ONAYDURUMU, PSKaliteKontrol.Dara from PSKaliteKontrol
+      where PSKaliteKontrol.PartiSinifID = :PartiSinifID
+      into :KaliteNo, :Kilo, :Metre, :OnayDurumu, :Dara do
+    begin
+      DaraToplami = DaraToplami + Dara;
+      if (KaliteNo = 1) then
+      begin
+        K1KiloToplami = K1KiloToplami + :Kilo;
+        K1MetreToplami = K1MetreToplami + :Metre;
+        K1TopAdedi = K1TopAdedi + 1;
+       if (OnayDurumu = 2 ) then
+        begin
+           K1REDMETRE             =K1REDMETRE +  :Metre;
+        end
+
+      end
+      else if (KaliteNo = 2) then
+      begin
+        K2KiloToplami = K2KiloToplami + :Kilo;
+        K2MetreToplami = K2MetreToplami + :Metre;
+        K2TopAdedi = K2TopAdedi + 1;
+         if (OnayDurumu = 2 ) then
+        begin
+           K2REDMETRE             =K2REDMETRE +  :Metre;
+        end
+
+      end
+      else if (KaliteNo = 3) then
+      begin
+        K3KiloToplami = K3KiloToplami + :Kilo;
+        K3MetreToplami = K3MetreToplami + :Metre;
+        K3TopAdedi = K3TopAdedi + 1;
+         if (OnayDurumu = 2 ) then
+        begin
+           K3REDMETRE             =K3REDMETRE +  :Metre;
+        end
+      end
+      else if (KaliteNo = 4) then
+      begin
+        K4KiloToplami = K4KiloToplami + :Kilo;
+        K4MetreToplami = K4MetreToplami + :Metre;
+        K4TopAdedi = K4TopAdedi + 1;
+         if (OnayDurumu = 2 ) then
+        begin
+           K4REDMETRE             =K4REDMETRE +  :Metre;
+        end
+      end
+      else
+      begin
+        K5KiloToplami = K5KiloToplami + :Kilo;
+        K5MetreToplami = K5MetreToplami + :Metre;
+        K5TopAdedi = K5TopAdedi + 1;
+         if (OnayDurumu = 2 ) then
+        begin
+           K5REDMETRE             =K5REDMETRE +  :Metre;
+        end
+      end
+    end
+
+    KiloToplami = K1KiloToplami + K2KiloToplami + K3KiloToplami + K4KiloToplami + K5KiloToplami;
+    NetKiloToplami = KiloToplami - DaraToplami;
+    MetreToplami = K1MetreToplami + K2MetreToplami + K3MetreToplami + K4MetreToplami + K5MetreToplami;
+    FireKg = KiloToplami - NetKiloToplami;
+
+
+    if (BrutKilo <> 0) then KiloFireOrani  = (BrutKilo - NetKiloToplami) / BrutKilo * 100;
+    if (BrutMetre <> 0) then MetreFireOrani  = (BrutMetre - MetreToplami) / BrutMetre * 100;
+
+    if (KaliteKontrolAsamaID is not null) then
+    begin
+      GirisPersonelAdi  = Null;
+      GirisTarihi       = Null;
+      CikisPersonelAdi  = Null;
+      CikisTarihi       = Null;
+
+      Select Max(PartiAsamalariID) from PartiAsamaStok
+        where PartiAsamaStok.PartiSinifId = :PartiSinifId and PartiAsamaStok.AsamaID = :KaliteKontrolAsamaID and PartiAsamaStok.AsamayaDahil = 1
+        into :PartiAsamalariID;
+
+      if (PartiAsamalariID is not null) then
+      begin
+        Select Min(PartiAsamaStokDetay.GirisTarihi), Max(PartiAsamaStokDetay.CikisTarihi), Min(Gp.Adi), Max(Cp.Adi) from PartiAsamaStokDetay
+          left join Personel Gp on Gp.PersonelId = PartiAsamaStokDetay.GirisPersonelId
+          left join Personel Cp on Cp.PersonelId = PartiAsamaStokDetay.CikisPersonelId
+          where PartiAsamaStokDetay.PartiAsamalariID = :PartiAsamalariID and PartiAsamaStokDetay.PartiSinifId = :PartiSinifId
+          into :GirisTarihi, CikisTarihi, :GirisPersonelAdi, :CikisPersonelAdi;
+      end
+
+    end
+    suspend;
+  end
+end
