@@ -36,6 +36,57 @@ namespace DataAccess.Concrete.EntityFrameWork
             }
 
         }
+
+        public List<CarDetailDto> GetCarsBrandId(int BranId)
+        {
+            using (NorthwindContext context = new NorthwindContext())
+            {
+                var result = from c in context.Car
+                             join co in context.Color on c.ColorId equals co.ColorId
+                             join b in context.Brand on c.BrandId equals b.BrandId
+                             where b.BrandId == BranId
+                             select new CarDetailDto
+                             {
+                                 CarId = c.Id,
+                                 BrandId = b.BrandId,
+                                 CarName = c.Description,
+                                 ColorName = co.ColorName,
+                                 BrandName = b.BrandName,
+                                 ModelYear = c.ModelYear,
+                                 DailyPrice = c.DailyPrice
+
+                             };
+
+                return result.ToList();
+            }
+        }
+
+
+        public List<CarDetailDto> GetCarsColorId(int ColorId)
+        {
+            using (NorthwindContext context = new NorthwindContext())
+            {
+                var result = from c in context.Car
+                             join co in context.Color on c.ColorId equals co.ColorId
+                             join b in context.Brand on c.BrandId equals b.BrandId
+                             where co.ColorId == ColorId
+                             select new CarDetailDto
+                             {
+                                 CarId = c.Id,
+                                 BrandId = b.BrandId,
+                                 CarName = c.Description,
+                                 ColorName = co.ColorName,
+                                 BrandName = b.BrandName,
+                                 ModelYear = c.ModelYear,
+                                 DailyPrice = c.DailyPrice
+
+                             };
+
+                return result.ToList();
+            }
+        }
+
+
     }
 
 

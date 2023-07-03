@@ -124,11 +124,10 @@ namespace WebAPI.Controllers
 
         }
 
-        [HttpGet("getbrandId")]
-        // [Authorize(Roles ="CarList")]
-        public IActionResult GetCarsBrandId()
+        [HttpGet("getbrandid")]
+        public IActionResult GetCarsBrandId(int brandid)
         {
-            var result = _carService.GetAll();
+            var result = _carService.GetCarsBrandId(brandid);
 
             if (result.Success)
             {
@@ -140,6 +139,21 @@ namespace WebAPI.Controllers
 
         }
 
+        [HttpGet("getcolorid")]
+        // [Authorize(Roles ="CarList")]
+        public IActionResult GetCarsColorId(int colorid)
+        {
+            var result = _carService.GetCarsColorId(colorid);
+
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+
+                return BadRequest(result);
+
+        }
 
 
     }
